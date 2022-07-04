@@ -13,6 +13,8 @@ module.exports = defineConfig({
     }
   },
   devServer: {
+    port: 80,
+    allowedHosts: 'all',
     onBeforeSetupMiddleware(devServer) {
       registerRouter(devServer.app)
     }
