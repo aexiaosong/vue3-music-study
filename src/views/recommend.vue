@@ -68,7 +68,7 @@ export default {
       position: relative;
       width: 100%;
       height: 0;
-      padding-top: 60%;
+      padding-top: 40%;
       overflow: hidden;
       .slider-content {
         position: absolute;
