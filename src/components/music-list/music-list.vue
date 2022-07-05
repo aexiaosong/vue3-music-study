@@ -7,7 +7,14 @@
     <div class="bg-image" :style="bgImgStyle" ref="bgImageEl">
       <div class="filter" :style="bgImgFilterStyle"></div>
     </div>
-    <scroll class="list" :style="scrollStyle" v-loading="loading" :probe-type="3" @scroll="onScroll">
+    <scroll
+      class="list"
+      :style="scrollStyle"
+      v-loading:[loadingText]="loading"
+      v-no-result:[noResultText]="noResult"
+      :probe-type="3"
+      @scroll="onScroll"
+    >
       <div class="song-list-wrapper">
         <song-list :songs="songs"></song-list>
       </div>
@@ -31,9 +38,20 @@ export default {
     },
     title: String,
     pic: String,
-    loading: Boolean
+    loading: Boolean,
+    loadingText: {
+      type: String,
+      default: '音乐列表加载中...'
+    },
+    noResultText: {
+      type: String,
+      default: '鹅~没有结果啦~'
+    }
   },
   computed: {
+    noResult() {
+      return !this.loading && this.songs.length == 0
+    },
     bgImgStyle() {
       const scrollY = this.scrollY
       let zIndex = 0
