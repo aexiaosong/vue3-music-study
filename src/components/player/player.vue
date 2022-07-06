@@ -12,6 +12,13 @@
         <h2 class="subtitle">{{currentSong.singer}}</h2>
       </div>
       <div class="bottom">
+        <div class="progress-wrapper">
+          <span class="time time-l">{{formatTime(currentTime)}}</span>
+          <div class="progress-bar-wrapper">
+            <progress-bar :progress="progress"></progress-bar>
+          </div>
+          <span class="time time-r">{{formatTime(currentSong.duration)}}</span>
+        </div>
         <div class="operators">
           <div class="icon i-left">
             <i @click="changePlayMode" :class="playModeIcon"></i>
@@ -36,6 +43,7 @@
       @pause="pause"
       @canplay="audioReady"
       @error="audioError"
+      @timeupdate="updateSongTime"
     />
   </div>
 </template>
@@ -43,15 +51,19 @@
 <script>
 import { useStore } from 'vuex'
 import { computed, watch, ref } from 'vue'
+import ProgressBar from './progress-bar'
 import useMode from './useMode'
 import useFavorite from './useFavorite'
+import { formatTime } from '@/assets/js/utils'
 
 export default {
   name: 'player',
+  components: { ProgressBar },
   setup() {
     const audioRef = ref(null)
     // 播放器是否准备好
     const songReady = ref(false)
+    const currentTime = ref(0)
 
     const store = useStore()
     const { state, getters } = store
@@ -65,9 +77,12 @@ export default {
     const playIcon  = computed(() => playing.value ? 'icon-pause' : 'icon-play')
     // 操作按钮样式
     const disableCls = computed(() => songReady.value ? '' : 'disable')
+    
+    const progress = computed(() => currentTime.value / currentSong.value.duration)
 
     watch(currentSong, (newSong) => {
       if (!newSong.id || !newSong.url) return
+      currentTime.value = 0
       const audioEl = audioRef.value
       audioEl.src = newSong.url
       songReady.value = false
@@ -154,6 +169,11 @@ export default {
       songReady.value = true
     }
 
+    // 播放器进度更新回调
+    const updateSongTime = (e) => {
+      currentTime.value = e.target.currentTime
+    }
+
     // 播放模式hook
     const { playModeIcon, changePlayMode } = useMode()
     const { getFavoriteIcon, toggleFavorite } = useFavorite()
@@ -162,7 +182,8 @@ export default {
       fullScreen, currentSong, audioRef, playIcon, disableCls,
       exitFullScreen, togglePlay, pause, prev, next, audioReady, audioError,
       playModeIcon, changePlayMode,
-      getFavoriteIcon, toggleFavorite
+      getFavoriteIcon, toggleFavorite,
+      currentTime, progress, updateSongTime, formatTime
     }
   }
 }
@@ -228,6 +249,29 @@ export default {
       position: absolute;
       bottom: 50px;
       width: 100%;
+      .progress-wrapper {
+        display: flex;
+        align-items: center;
+        width: 80%;
+        margin: 0 auto;
+        padding: 10px 0;
+        .time {
+          color: $color-text;
+          font-size: $font-size-small;
+          flex: 0 0 40px;
+          line-height: 30px;
+          width: 40px;
+          &.time-l {
+            text-align: left;
+          }
+          &.time-r {
+            text-align: right;
+          }
+        }
+        .progress-bar-wrapper {
+          flex: 1;
+        }
+      }
       .operators {
         display: flex;
         align-items: center;
