@@ -15,7 +15,12 @@
         <div class="progress-wrapper">
           <span class="time time-l">{{formatTime(currentTime)}}</span>
           <div class="progress-bar-wrapper">
-            <progress-bar :progress="progress"></progress-bar>
+            <progress-bar
+              :progress="progress"
+              @progressChanging="onProgressChanging"
+              @progressChanged="onProgressChanged"
+            >
+            </progress-bar>
           </div>
           <span class="time time-r">{{formatTime(currentSong.duration)}}</span>
         </div>
@@ -44,6 +49,7 @@
       @canplay="audioReady"
       @error="audioError"
       @timeupdate="updateSongTime"
+      @ended="audioEnd"
     />
   </div>
 </template>
@@ -55,6 +61,7 @@ import ProgressBar from './progress-bar'
 import useMode from './useMode'
 import useFavorite from './useFavorite'
 import { formatTime } from '@/assets/js/utils'
+import { PLAY_MODE } from '@/assets/js/constant'
 
 export default {
   name: 'player',
@@ -64,6 +71,7 @@ export default {
     // 播放器是否准备好
     const songReady = ref(false)
     const currentTime = ref(0)
+    let progressChanging = false
 
     const store = useStore()
     const { state, getters } = store
@@ -156,6 +164,8 @@ export default {
     const replay = () => {
       const audioEl = audioRef.value
       audioEl.currentTime = 0
+      audioEl.play()
+      store.commit('setPlayingState', true)
     }
 
     // 播放器缓冲成功的回调
@@ -171,19 +181,46 @@ export default {
 
     // 播放器进度更新回调
     const updateSongTime = (e) => {
-      currentTime.value = e.target.currentTime
+      if (!progressChanging) {
+        currentTime.value = e.target.currentTime
+      }
+    }
+
+    // 进度条拖动回调
+    const onProgressChanging = (progress) => {
+      progressChanging = true
+      currentTime.value = progress * currentSong.value.duration
+    }
+
+    // 进度条拖动结束回调
+    const onProgressChanged = (progress) => {
+      audioRef.value.currentTime = currentTime.value = progress * currentSong.value.duration
+      if (!playing.value) {
+        store.commit('setPlayingState', true)
+      }
+      progressChanging = false
+    }
+
+    // 歌曲播放结束回调
+    const audioEnd = () => {
+      currentTime.value = 0
+      if (playMode.value === PLAY_MODE.loop) {
+        replay()
+      } else {
+        next()
+      }
     }
 
     // 播放模式hook
-    const { playModeIcon, changePlayMode } = useMode()
+    const { playMode, playModeIcon, changePlayMode } = useMode()
     const { getFavoriteIcon, toggleFavorite } = useFavorite()
 
     return {
       fullScreen, currentSong, audioRef, playIcon, disableCls,
-      exitFullScreen, togglePlay, pause, prev, next, audioReady, audioError,
+      exitFullScreen, togglePlay, pause, prev, next, audioReady, audioError, audioEnd,
       playModeIcon, changePlayMode,
       getFavoriteIcon, toggleFavorite,
-      currentTime, progress, updateSongTime, formatTime
+      currentTime, progress, updateSongTime, formatTime, onProgressChanging, onProgressChanged,
     }
   }
 }

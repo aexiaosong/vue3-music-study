@@ -18,6 +18,6 @@ export default function useMode() {
   }
 
   return {
-    playModeIcon, changePlayMode
+    playMode, playModeIcon, changePlayMode
   }
 }

@@ -1,9 +1,15 @@
 <template>
-  <div class="progress-bar">
+  <div class="progress-bar" @click="onClick">
     <div class="bar-inner">
-      <div class="progress" :style="progressStyle">
+      <div class="progress" ref="progress" :style="progressStyle">
       </div>
-      <div class="progress-btn-wrapper" :style="btnStyle">
+      <div
+        class="progress-btn-wrapper"
+        :style="btnStyle"
+        @touchstart.prevent="onTouchStart"
+        @touchmove.prevent="onTouchMove"
+        @touchend.prevent="onTouchEnd"
+      >
         <div class="progress-btn"></div>
       </div>
     </div>
@@ -21,10 +27,15 @@ export default {
       default: 0
     }
   },
+  emits: ['progress-changing', 'progress-changed'],
   data() {
     return {
       offset: 0
     }
+  },
+  created() {
+    // 如果把touch写在data中会被封装才响应式，而在created中只是在this身上挂载属性，这样可以提升性能
+    this.touch = {}
   },
   computed: {
     progressStyle() {
@@ -38,6 +49,37 @@ export default {
     progress(newVal) {
       const barWidth = this.$el.clientWidth - progressBtnWidth
       this.offset = barWidth * newVal
+    }
+  },
+  methods: {
+    // 拖动前计入点击位置
+    onTouchStart(e) {
+      console.log('bar testing', this.touch, this.tt)
+      this.touch.startX = e.touches[0].pageX
+      this.touch.beginWidth = this.$refs.progress.clientWidth
+    },
+    // 拖动时更新进度条
+    onTouchMove(e) {
+      const dx = e.touches[0].pageX - this.touch.startX
+      const tempWidth = this.touch.beginWidth + dx
+      const barWidth = this.$el.clientWidth - progressBtnWidth
+      const progress = Math.max(0, Math.min(1, tempWidth / barWidth))
+      this.offset = progress * barWidth
+      this.$emit('progress-changing', progress)
+    },
+    // 拖动结束
+    onTouchEnd() {
+      const barWidth = this.$el.clientWidth - progressBtnWidth
+      const progress = this.$refs.progress.clientWidth / barWidth
+      this.$emit('progress-changed', progress)
+    },
+    // 点击进度条
+    onClick(e) {
+      const rect = this.$el.getBoundingClientRect()
+      const offsetWidth = e.pageX - rect.left
+      const barWidth = this.$el.clientWidth - progressBtnWidth
+      const progress = offsetWidth / barWidth
+      this.$emit('progress-changed', progress)
     }
   }
 }
