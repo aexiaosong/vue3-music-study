@@ -11,16 +11,44 @@
         <h1 class="title">{{currentSong.name}}</h1>
         <h2 class="subtitle">{{currentSong.singer}}</h2>
       </div>
-      <div class="middle">
-        <div class="middle-l">
+      <div class="middle"
+        @touchstart.prevent="onMiddleTouchStart"
+        @touchmove.prevent="onMiddleTouchMove"
+        @touchend.prevent="onMiddleTouchEnd"
+      >
+        <div class="middle-l" :style="middleLStyle">
           <div class="cd-wrapper">
             <div class="cd" ref="cdRef">
               <img ref="cdImgRef" class="image" :class="cdCls" :src="currentSong.pic" />
             </div>
           </div>
+          <div class="playing-lyric-wrapper">
+            <div class="playing-lyric">{{playingLyric}}</div>
+          </div>
         </div>
+        <scroll class="middle-r" :style="middleRStyle" ref="lyricScrollRef">
+          <div class="lyric-wrapper">
+            <div ref="lyricListRef" v-if="currentLyric">
+              <p
+                class="text"
+                :class="{'current': currentLineNum === index}"
+                v-for="(line, index) in currentLyric.lines"
+                :key="line.num"
+              >
+                {{line.txt}}
+              </p>
+            </div>
+            <div class="pure-music" v-show="pureMusicLyric">
+              <p>{{pureMusicLyric}}</p>
+            </div>
+          </div>
+        </scroll>
       </div>
       <div class="bottom">
+        <div class="dot-wrapper">
+          <span class="dot" :class="{'active': currentDotShow==='cd'}"></span>
+          <span class="dot" :class="{'active': currentDotShow==='lyric'}"></span>
+        </div>
         <div class="progress-wrapper">
           <span class="time time-l">{{formatTime(currentTime)}}</span>
           <div class="progress-bar-wrapper">
@@ -67,17 +95,21 @@
 import { useStore } from 'vuex'
 import { computed, watch, ref } from 'vue'
 import ProgressBar from './progress-bar'
+import Scroll from '@/components/base/scroll/scroll'
 import useMode from './useMode'
 import useFavorite from './useFavorite'
 import useCd from './useCd'
+import useLyric from './useLyric'
+import useMiddleInteractive from './useMiddleInteractive'
 import { formatTime } from '@/assets/js/utils'
 import { PLAY_MODE } from '@/assets/js/constant'
 
 export default {
   name: 'player',
-  components: { ProgressBar },
+  components: { ProgressBar, Scroll },
   setup() {
     const audioRef = ref(null)
+    
     // 播放器是否准备好
     const songReady = ref(false)
     const currentTime = ref(0)
@@ -113,8 +145,10 @@ export default {
       const audioEl = audioRef.value
       if (newPlaying) {
         audioEl.play()
+        playLyric()
       } else {
         audioEl.pause()
+        stopLyric()
       }
     })
 
@@ -182,6 +216,7 @@ export default {
     const audioReady = () => {
       if (songReady.value) return
       songReady.value = true
+      playLyric()
     }
 
     // 播放器缓冲失败的回调
@@ -200,6 +235,8 @@ export default {
     const onProgressChanging = (progress) => {
       progressChanging = true
       currentTime.value = progress * currentSong.value.duration
+      playLyric() // 修改了currentTime需要让歌词同步到当前文章
+      stopLyric() // 进度条拖动的途中把歌词停下来
     }
 
     // 进度条拖动结束回调
@@ -209,6 +246,7 @@ export default {
         store.commit('setPlayingState', true)
       }
       progressChanging = false
+      playLyric() // 松开进度条后播放歌词
     }
 
     // 歌曲播放结束回调
@@ -224,7 +262,19 @@ export default {
     // 播放模式hook
     const { playMode, playModeIcon, changePlayMode } = useMode()
     const { getFavoriteIcon, toggleFavorite } = useFavorite()
-    const { cdCls, cdRef, cdImgRef } = useCd(playing)
+    const { cdCls, cdRef, cdImgRef } = useCd()
+    const {
+      currentLyric,
+      currentLineNum,
+      playLyric, stopLyric,
+      lyricScrollRef, lyricListRef,
+      pureMusicLyric, playingLyric
+    } = useLyric({ songReady, currentTime })
+    const {
+      middleLStyle, middleRStyle,
+      currentDotShow,
+      onMiddleTouchStart, onMiddleTouchMove, onMiddleTouchEnd
+    } = useMiddleInteractive()
 
     return {
       fullScreen, currentSong, audioRef, playIcon, disableCls,
@@ -232,7 +282,9 @@ export default {
       playModeIcon, changePlayMode,
       getFavoriteIcon, toggleFavorite,
       currentTime, progress, updateSongTime, formatTime, onProgressChanging, onProgressChanged,
-      cdCls, cdRef, cdImgRef
+      cdCls, cdRef, cdImgRef,
+      currentLyric, currentLineNum, lyricScrollRef, lyricListRef, pureMusicLyric, playingLyric,
+      middleLStyle, middleRStyle, currentDotShow, onMiddleTouchStart, onMiddleTouchMove, onMiddleTouchEnd
     }
   }
 }
@@ -333,12 +385,69 @@ export default {
             }
           }
         }
+        .playing-lyric-wrapper {
+          width: 80%;
+          margin: 30px auto 0;
+          overflow: hidden;
+          text-align: center;
+          .playing-lyric {
+            height: 20px;
+            line-height: 20px;
+            font-size: $font-size-medium;
+            color: $color-text-l;
+          }
+        }
+      }
+      .middle-r {
+        display: inline-block;
+        vertical-align: top;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        .lyric-wrapper {
+          width: 80%;
+          margin: 0 auto;
+          overflow: hidden;
+          text-align: center;
+          .text {
+            line-height: 32px;
+            color: $color-text-l;
+            font-size: $font-size-medium;
+            &.current {
+              color: $color-text;
+            }
+          }
+          .pure-music {
+            padding-top: 50%;
+            line-height: 32px;
+            color: $color-text-l;
+            font-size: $font-size-medium;
+          }
+        }
       }
     }
     .bottom {
       position: absolute;
       bottom: 50px;
       width: 100%;
+      .dot-wrapper {
+        text-align: center;
+        font-size: 0;
+        .dot {
+          display: inline-block;
+          vertical-align: middle;
+          margin: 0 4px;
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: $color-text-l;
+          &.active {
+            width: 20px;
+            border-radius: 5px;
+            background: $color-text-ll;
+          }
+        }
+      }
       .progress-wrapper {
         display: flex;
         align-items: center;

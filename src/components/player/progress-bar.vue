@@ -54,7 +54,6 @@ export default {
   methods: {
     // 拖动前计入点击位置
     onTouchStart(e) {
-      console.log('bar testing', this.touch, this.tt)
       this.touch.startX = e.touches[0].pageX
       this.touch.beginWidth = this.$refs.progress.clientWidth
     },
