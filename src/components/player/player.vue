@@ -53,6 +53,7 @@
           <span class="time time-l">{{formatTime(currentTime)}}</span>
           <div class="progress-bar-wrapper">
             <progress-bar
+              ref="progressBarRef"
               :progress="progress"
               @progressChanging="onProgressChanging"
               @progressChanged="onProgressChanged"
@@ -94,7 +95,7 @@
 
 <script>
 import { useStore } from 'vuex'
-import { computed, watch, ref } from 'vue'
+import { computed, watch, ref, nextTick } from 'vue'
 import { formatTime } from '@/assets/js/utils'
 import { PLAY_MODE } from '@/assets/js/constant'
 
@@ -114,6 +115,7 @@ export default {
   components: { ProgressBar, Scroll, MiniPlayer },
   setup() {
     const audioRef = ref(null)
+    const progressBarRef = ref(null)
     
     // 播放器是否准备好
     const songReady = ref(false)
@@ -154,6 +156,13 @@ export default {
       } else {
         audioEl.pause()
         stopLyric()
+      }
+    })
+
+    watch(fullScreen, async (newFullScreen) => {
+      if (newFullScreen) {
+        await nextTick()
+        progressBarRef.value.setOffset(progress.value)
       }
     })
 
@@ -286,7 +295,7 @@ export default {
       exitFullScreen, togglePlay, pause, prev, next, audioReady, audioError, audioEnd,
       playModeIcon, changePlayMode,
       getFavoriteIcon, toggleFavorite,
-      currentTime, progress, updateSongTime, formatTime, onProgressChanging, onProgressChanged,
+      currentTime, progress, updateSongTime, formatTime, onProgressChanging, onProgressChanged, progressBarRef,
       cdImgCls, cdRef, cdImgRef,
       currentLyric, currentLineNum, lyricScrollRef, lyricListRef, pureMusicLyric, playingLyric,
       middleLStyle, middleRStyle, currentDotShow, onMiddleTouchStart, onMiddleTouchMove, onMiddleTouchEnd
