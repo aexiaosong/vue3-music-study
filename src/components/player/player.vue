@@ -1,5 +1,5 @@
 <template>
-  <div class="player">
+  <div class="player" v-show="playlist.length">
     <div class="normal-player" v-show="fullScreen">
       <div class="background">
         <img :src="currentSong.pic" />
@@ -19,7 +19,7 @@
         <div class="middle-l" :style="middleLStyle">
           <div class="cd-wrapper">
             <div class="cd" ref="cdRef">
-              <img ref="cdImgRef" class="image" :class="cdCls" :src="currentSong.pic" />
+              <img ref="cdImgRef" class="image" :class="cdImgCls" :src="currentSong.pic" />
             </div>
           </div>
           <div class="playing-lyric-wrapper">
@@ -80,6 +80,7 @@
         </div>
       </div>
     </div>
+    <mini-player></mini-player>
     <audio
       ref="audioRef"
       @pause="pause"
@@ -94,19 +95,23 @@
 <script>
 import { useStore } from 'vuex'
 import { computed, watch, ref } from 'vue'
+import { formatTime } from '@/assets/js/utils'
+import { PLAY_MODE } from '@/assets/js/constant'
+
 import ProgressBar from './progress-bar'
 import Scroll from '@/components/base/scroll/scroll'
+import MiniPlayer from './mini-player.vue'
+
 import useMode from './useMode'
 import useFavorite from './useFavorite'
 import useCd from './useCd'
 import useLyric from './useLyric'
 import useMiddleInteractive from './useMiddleInteractive'
-import { formatTime } from '@/assets/js/utils'
-import { PLAY_MODE } from '@/assets/js/constant'
+
 
 export default {
   name: 'player',
-  components: { ProgressBar, Scroll },
+  components: { ProgressBar, Scroll, MiniPlayer },
   setup() {
     const audioRef = ref(null)
     
@@ -262,7 +267,7 @@ export default {
     // 播放模式hook
     const { playMode, playModeIcon, changePlayMode } = useMode()
     const { getFavoriteIcon, toggleFavorite } = useFavorite()
-    const { cdCls, cdRef, cdImgRef } = useCd()
+    const { cdImgCls, cdRef, cdImgRef } = useCd()
     const {
       currentLyric,
       currentLineNum,
@@ -277,12 +282,12 @@ export default {
     } = useMiddleInteractive()
 
     return {
-      fullScreen, currentSong, audioRef, playIcon, disableCls,
+      fullScreen, currentSong, audioRef, playIcon, disableCls, playlist,
       exitFullScreen, togglePlay, pause, prev, next, audioReady, audioError, audioEnd,
       playModeIcon, changePlayMode,
       getFavoriteIcon, toggleFavorite,
       currentTime, progress, updateSongTime, formatTime, onProgressChanging, onProgressChanged,
-      cdCls, cdRef, cdImgRef,
+      cdImgCls, cdRef, cdImgRef,
       currentLyric, currentLineNum, lyricScrollRef, lyricListRef, pureMusicLyric, playingLyric,
       middleLStyle, middleRStyle, currentDotShow, onMiddleTouchStart, onMiddleTouchMove, onMiddleTouchEnd
     }

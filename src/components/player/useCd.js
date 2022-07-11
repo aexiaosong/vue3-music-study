@@ -7,7 +7,7 @@ export default function useCd() {
   
   const store = useStore()
   const playing = computed(() => store.state.playing)
-  const cdCls = computed(() => playing.value ? 'playing' : '')
+  const cdImgCls = computed(() => playing.value ? 'playing' : '')
 
   watch(playing, (newPlaying) => {
     if (!newPlaying) {
@@ -22,5 +22,5 @@ export default function useCd() {
     wrapper.style.transform = wrapperTransform === 'none' ? innerTransform : innerTransform.concat(' ', wrapperTransform)
   }
 
-  return { cdCls, cdRef, cdImgRef }
+  return { cdImgCls, cdRef, cdImgRef }
 }
