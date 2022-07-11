@@ -6,9 +6,14 @@
           <img ref="cdImgRef" :class="cdImgCls" width="40" height="40" :src="currentSong.pic" />
         </div>
       </div>
-      <div>
+      <div class="slider-wrapper">
         <h2 class="name">{{currentSong.name}}</h2>
         <p class="desc">{{currentSong.singer}}</p>
+      </div>
+      <div class="control">
+        <progress-circle :progress="progress" :radius="32">
+          <i class="icon-mini" :class="miniPlayIcon" @click.stop="togglePlay"></i>
+        </progress-circle>
       </div>
     </div>
   </transition>
@@ -18,13 +23,25 @@
 import { useStore } from 'vuex'
 import { computed } from 'vue'
 import useCd from './useCd'
+import ProgressCircle from './progress-circle'
 
 export default {
   name: 'mini-player',
+  components: { ProgressCircle },
+  props: {
+    progress: {
+      type: Number,
+      default: 0
+    },
+    togglePlay: Function
+  },
   setup() {
     const store = useStore()
     const fullScreen = computed(() => store.state.fullScreen)
+    const playing = computed(() => store.state.playing)
     const currentSong = computed(() =>store.getters.currentSong)
+
+    const miniPlayIcon = computed(() => playing.value ? 'icon-pause-mini' : 'icon-play-mini')
 
     const showNormalPlayer = () => {
       store.commit('setFullScreen', true)
@@ -35,7 +52,8 @@ export default {
     return {
       fullScreen, currentSong,
       cdImgCls, cdRef, cdImgRef,
-      showNormalPlayer
+      showNormalPlayer,
+      miniPlayIcon
     }
   }
 }
@@ -71,16 +89,42 @@ export default {
       }
     }
   }
-  .name {
-    margin-bottom: 2px;
-    @include no-wrap();
-    font-size: $font-size-medium;
-    color: $color-text;
+  .slider-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    line-height: 20px;
+    overflow: hidden;
+    .name {
+      margin-bottom: 2px;
+      @include no-wrap();
+      font-size: $font-size-medium;
+      color: $color-text;
+    }
+    .desc {
+      @include no-wrap();
+      font-size: $font-size-small;
+      color: $color-text-d;
+    }
   }
-  .desc {
-    @include no-wrap();
-    font-size: $font-size-small;
-    color: $color-text-d;
+  .control {
+    flex: 0 0 30px;
+    width: 30px;
+    padding: 0 10px;
+    .icon-playlist {
+      position: relative;
+      top: -2px;
+      font-size: 28px;
+      color: $color-theme-d;
+    }
+    .icon-mini {
+      position: absolute;
+      left: 0;
+      top: 0;
+      color: $color-theme-d;
+      font-size: 32px;
+    }
   }
   &.mini-enter-active, &.mini-leave-active {
     transition: all 0.6s cubic-bezier(0.45, 0, 0.55, 1);
