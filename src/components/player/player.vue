@@ -144,6 +144,7 @@ export default {
       audioEl.src = newSong.url
       songReady.value = false
       audioEl.play()
+      store.commit('setPlayingState', true)
     })
 
     // 监听播放器状态，根据状态让播放器播放或暂停
