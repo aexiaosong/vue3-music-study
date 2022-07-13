@@ -109,7 +109,7 @@ import { PLAY_MODE } from '@/assets/js/constant'
 
 import ProgressBar from './progress-bar'
 import Scroll from '@/components/base/scroll/scroll'
-import MiniPlayer from './mini-player.vue'
+import MiniPlayer from './mini-player'
 
 import useMode from './useMode'
 import useFavorite from './useFavorite'
@@ -204,9 +204,6 @@ export default {
           index = list.length - 1
         }
         store.commit('setCurrentIndex', index)
-        if (!playing.value) { // 播放状态下会自动播放，加个判断提升性能
-          store.commit('setPlayingState', true)
-        }
       }
     }
 
@@ -222,9 +219,6 @@ export default {
           index = 0
         }
         store.commit('setCurrentIndex', index)
-        if (!playing.value) { // 播放状态下会自动播放，加个判断提升性能
-          store.commit('setPlayingState', true)
-        }
       }
     }
 
