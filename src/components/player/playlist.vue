@@ -180,6 +180,13 @@ export default {
           font-size: $font-size-medium;
           color: $color-text-d;
         }
+        .clear {
+          @include extend-click();
+          .icon-clear {
+            font-size: $font-size-medium;
+            color: $color-text-d;
+          }
+        }
       }
     }
     .list-content {
