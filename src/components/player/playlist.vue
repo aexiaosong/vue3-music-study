@@ -7,6 +7,9 @@
             <h1 class="title">
               <i class="icon" :class="playModeIcon" @click="changePlayMode"></i>
               <span class="text">{{playModeText}}</span>
+              <span class="clear" @click="showConfirm">
+                <i class="icon-clear"></i>
+              </span>
             </h1>
           </div>
           <scroll ref="scrollRef" class="list-content">
@@ -27,6 +30,12 @@
             <span>关闭</span>
           </div>
         </div>
+        <confirm
+          ref="confirmRef"
+          text="是否清空播放列表"
+          confirm-btn-text="清空"
+          @confirm="confirmClear"
+        />
       </div>
     </transition>
   </teleport>
@@ -36,15 +45,17 @@
 import { useStore } from 'vuex'
 import { computed, ref, nextTick, watch } from 'vue'
 import Scroll from '@/components/base/scroll/scroll'
+import Confirm from '@/components/base/confirm/confirm'
 import useMode from './useMode'
 import useFavorite from './useFavorite'
 
 export default {
   name: 'playlist',
-  components: { Scroll },
+  components: { Scroll, Confirm },
   setup() {
     const scrollRef = ref(null)
     const listRef = ref(null)
+    const confirmRef = ref(null)
     const visible = ref(false)
     const moving = ref(false)
 
@@ -95,7 +106,17 @@ export default {
       if (moving.value) return
       moving.value = true
       store.dispatch('removeSong', song)
+      if (!playlist.value.length) hide()
       setTimeout(() => moving.value = false, 300)
+    }
+
+    const showConfirm = () => {
+      confirmRef.value.show()
+    }
+
+    const confirmClear = () => {
+      store.dispatch('clearSongList')
+      hide()
     }
 
     const { playModeText, playModeIcon, changePlayMode } = useMode()
@@ -108,7 +129,8 @@ export default {
       hide, show, getCurrentIcon,
       scrollRef, listRef,
       selectItem, removeSong,
-      moving
+      moving,
+      showConfirm, confirmRef, confirmClear
     }
   }
 }
