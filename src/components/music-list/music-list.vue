@@ -22,7 +22,7 @@
       @scroll="onScroll"
     >
       <div class="song-list-wrapper">
-        <song-list :songs="songs" @select="selectItem"></song-list>
+        <song-list :rank="rank" :songs="songs" @select="selectItem"></song-list>
       </div>
     </scroll>
   </div>
@@ -53,6 +53,10 @@ export default {
     noResultText: {
       type: String,
       default: '鹅~没有结果啦~'
+    },
+    rank: {
+      type: Boolean,
+      default: false
     }
   },
   computed: {
