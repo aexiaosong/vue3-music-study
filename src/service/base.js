@@ -15,3 +15,5 @@ export function get(url, params) {
     console.log(e)
   })
 }
+
+export const flag = true

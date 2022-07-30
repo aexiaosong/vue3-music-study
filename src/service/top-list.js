@@ -1,9 +1,13 @@
-import { get } from './base'
+import { get, flag } from './base'
+import {
+  getTopList as getTopListV2,
+  getTopDetail as getTopDetailV2
+} from '@/api/top-list'
 
 export function getTopList() {
-  return get('/api/getTopList')
+  return flag ? getTopListV2() : get('/api/getTopList')
 }
 
 export function getTopDetail(top) {
-  return get('/api/getTopDetail', { id: top.id, period: top.period })
+  return flag ? getTopDetailV2(top) : get('/api/getTopDetail', { id: top.id, period: top.period })
 }

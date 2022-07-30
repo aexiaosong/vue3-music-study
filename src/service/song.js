@@ -1,6 +1,11 @@
-import { get } from './base'
+import { get, flag } from './base'
+import {
+  processSongs as processSongsV2,
+  getLyric as getLyricV2
+} from '@/api/song'
 
 export function processSongs(songs) {
+  if (flag) return processSongsV2(songs)
   if (!songs.length) {
     return Promise.resolve(songs)
   }
@@ -18,6 +23,7 @@ export function processSongs(songs) {
 const lyricMap = {}
 
 export function getLyric(song) {
+  if (flag) return getLyricV2(song)
   if (song.lyric) {
     return Promise.resolve(song.lyric)
   }
