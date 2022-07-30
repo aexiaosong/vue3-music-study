@@ -10,7 +10,7 @@ export async function getTopList() {
       id: item.id,
       mid: item.id,
       name: item.name,
-      pic: item.coverImgUrl,
+      pic: item.coverImgUrl + '?param=300y300',
       // songList: item.tracks.map(song => ({
       //   id: Math.random().toString(36).substring(2, 7), // 这个id仅作为虚拟dom的key
       //   singerName: song.second,
@@ -25,7 +25,7 @@ export async function getTopList() {
           mid: song.id,
           album: song.al.name,
           name: song.name,
-          pic: song.al.picUrl,
+          pic: song.al.picUrl + '?param=600y600',
           singer: song.ar.map(s => s.name).join('/'),
           url: '',
           songName: song.name,
@@ -42,7 +42,6 @@ export async function getTopList() {
 
 export function getTopDetail(top) {
   if (topListCache[top.id]) {
-    console.log('get cache')
     return { songs: topListCache[top.id] }
   }
   return get('/playlist/detail', { id: top.id }).then(res => {
@@ -54,7 +53,7 @@ export function getTopDetail(top) {
         mid: song.id,
         album: song.al.name,
         name: song.name,
-        pic: song.al.picUrl,
+        pic: song.al.picUrl + '?param=600y600',
         singer: song.ar.map(s => s.name).join('/'),
         url: ''
       }

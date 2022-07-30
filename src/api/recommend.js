@@ -29,7 +29,8 @@ export function getAlbums() {
     return res.playlists.map(e => {
       return {
         id: e.id,
-        pic: e.coverImgUrl,
+        mid: e.id,
+        pic: e.coverImgUrl + '?param=600y600',
         title: e.name,
         username: e.creator.nickname
       }

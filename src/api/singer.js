@@ -60,7 +60,7 @@ function map(singerList) {
       id: item.id,
       mid: item.id,
       name: item.name,
-      pic: item.picUrl
+      pic: item.img1v1Url + '?param=600y600'
     }
   })
 }
@@ -73,7 +73,6 @@ export async function getSingerDetail(singer) {
   //   pre[cur.id] = cur.dt
   //   return pre
   // }, {})
-  // TODO: songs fee
   songs = songs.filter(song => song.fee !== 1)
   return { songs: songs.map(song => {
     return {
@@ -81,10 +80,9 @@ export async function getSingerDetail(singer) {
       mid: song.id,
       album: song.al.name,
       name: song.name,
-      pic: song.al.picUrl,
+      pic: song.al.picUrl + '?param=600y600',
       singer: song.ar.map(s => s.name).join('/'),
       url: '',
-      // duration: dtMap[song.id] / 1000 | 0
     }
   }) }
 }

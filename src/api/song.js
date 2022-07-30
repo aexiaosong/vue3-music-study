@@ -8,11 +8,12 @@ export async function processSongs(songs) {
   const ids = songs.map(s => s.id).join(',')
   songs = await get('/song/detail', { ids }).then(res => {
     const dtMap = res.songs.reduce((pre, cur) => {
-      pre[cur.id] = cur.dt
+      pre[cur.id] = { duration: cur.dt, pic: cur.al.picUrl + '?param=600y600' }
       return pre
     }, {})
     return songs.map(s => {
-      s.duration = dtMap[s.id] / 1000 | 0
+      s.duration = dtMap[s.id].duration / 1000 | 0
+      s.pic = dtMap[s.id].pic
       return s
     })
   })
