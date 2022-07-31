@@ -127,6 +127,7 @@ export default {
       display: flex;
       align-items: center;
       padding-bottom: 20px;
+      position: relative;
       .icon {
         flex: 0 0 30px;
         width: 30px;

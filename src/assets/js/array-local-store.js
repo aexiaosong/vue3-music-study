@@ -1,7 +1,7 @@
 import storage from 'good-storage'
 
 function insertArray(list, val, compare, maxLen) {
-  const index = list.indexOf(compare)
+  const index = list.findIndex(compare)
   if (index === 0) return
   if (index > 0) {
     list.splice(index, 1)
@@ -35,4 +35,9 @@ export function remove(key, compare) {
 
 export function load(key) {
   return storage.get(key, [])
+}
+
+export function clear(key) {
+  storage.remove(key)
+  return []
 }
