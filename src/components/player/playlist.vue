@@ -26,6 +26,12 @@
               </li>
             </transition-group>
           </scroll>
+          <div class="list-add">
+            <div class="add" @click="showAddSong">
+              <i class="icon-add"></i>
+              <span class="text">添加歌曲到队列</span>
+            </div>
+          </div>
           <div class="list-footer" @click="hide">
             <span>关闭</span>
           </div>
@@ -36,6 +42,7 @@
           confirm-btn-text="清空"
           @confirm="confirmClear"
         />
+        <add-song ref="addSongRef"></add-song>
       </div>
     </transition>
   </teleport>
@@ -46,16 +53,18 @@ import { useStore } from 'vuex'
 import { computed, ref, nextTick, watch } from 'vue'
 import Scroll from '@/components/base/scroll/scroll'
 import Confirm from '@/components/base/confirm/confirm'
+import AddSong from '@/components/add-song/add-song'
 import useMode from './useMode'
 import useFavorite from './useFavorite'
 
 export default {
   name: 'playlist',
-  components: { Scroll, Confirm },
+  components: { Scroll, Confirm, AddSong },
   setup() {
     const scrollRef = ref(null)
     const listRef = ref(null)
     const confirmRef = ref(null)
+    const addSongRef = ref(null)
     const visible = ref(false)
     const moving = ref(false)
 
@@ -119,6 +128,10 @@ export default {
       hide()
     }
 
+    const showAddSong = () => {
+      addSongRef.value.show()
+    }
+
     const { playModeText, playModeIcon, changePlayMode } = useMode()
     const { getFavoriteIcon, toggleFavorite } = useFavorite()
 
@@ -130,7 +143,8 @@ export default {
       scrollRef, listRef,
       selectItem, removeSong,
       moving,
-      showConfirm, confirmRef, confirmClear
+      showConfirm, confirmRef, confirmClear,
+      addSongRef, showAddSong
     }
   }
 }
@@ -226,6 +240,25 @@ export default {
           &.disable {
             color: $color-theme-d;
           }
+        }
+      }
+    }
+    .list-add {
+      width: 140px;
+      margin: 20px auto 30px;
+      .add {
+        display: flex;
+        align-items: center;
+        padding: 8px 16px;
+        border: 1px solid $color-text-l;
+        border-radius: 100px;
+        color: $color-text-l;
+        .icon-add {
+          margin-right: 5px;
+          font-size: $font-size-small-s;
+        }
+        .text {
+          font-size: $font-size-small;
         }
       }
     }

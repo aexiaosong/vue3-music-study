@@ -3,7 +3,7 @@
     <transition-group name="list" tag="ul">
       <li v-for="item in searches" :key="item" class="search-item" @click="selectItem(item)">
         <span class="text">{{item}}</span>
-        <span class="icon" @click.stop="deleteItem(item)">
+        <span v-if="showDelete" class="icon" @click.stop="deleteItem(item)">
           <i class="icon-delete"></i>
         </span>
       </li>
@@ -18,6 +18,10 @@ export default {
     searches: {
       type: Array,
       default: () => []
+    },
+    showDelete: {
+      type: Boolean,
+      default: true
     }
   },
   emits: ['select', 'delete'],

@@ -10,6 +10,7 @@
   fullScreen: false, // 是否切换到全屏播放器
   favoriteList: load(FAVORITE_KEY), // 歌曲收藏列表
   searchHistory: load(SEARCH_KEY), // 搜索记录
+  playHistory: [] // 播放历史
  }
 
  export default state

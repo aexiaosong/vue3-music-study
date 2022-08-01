@@ -117,6 +117,7 @@ import useCd from './useCd'
 import useLyric from './useLyric'
 import useMiddleInteractive from './useMiddleInteractive'
 import useAnimation from './useAnimation'
+import usePlayHistory from './usePlayHistory'
 
 
 export default {
@@ -235,6 +236,7 @@ export default {
       if (songReady.value) return
       songReady.value = true
       playLyric()
+      savePlay(currentSong.value)
     }
 
     // 播放器缓冲失败的回调
@@ -294,6 +296,7 @@ export default {
       onMiddleTouchStart, onMiddleTouchMove, onMiddleTouchEnd
     } = useMiddleInteractive()
     const { cdWrapperRef, enter, afterEnter, leave, afterLeave } = useAnimation()
+    const { savePlay } = usePlayHistory()
 
     return {
       fullScreen, currentSong, audioRef, playIcon, disableCls, playlist,
