@@ -1,4 +1,4 @@
- import { PLAY_MODE, FAVORITE_KEY, SEARCH_KEY, PLAY_KEY } from '@/assets/js/constant'
+ import { PLAY_MODE, SEARCH_KEY } from '@/assets/js/constant'
  import { load } from '@/assets/js/array-local-store'
 
  const state = {
@@ -8,9 +8,9 @@
   playMode: PLAY_MODE.sequence, // 播放模式
   currentIndex: 0, // 当前播放的音乐在播放列表的索引
   fullScreen: false, // 是否切换到全屏播放器
-  favoriteList: load(FAVORITE_KEY), // 歌曲收藏列表
+  favoriteList: [], // 歌曲收藏列表，在main.js中获取数据
   searchHistory: load(SEARCH_KEY), // 搜索记录
-  playHistory: load(PLAY_KEY) // 播放历史
+  playHistory: [] // 播放历史，在main.js中获取数据
  }
 
  export default state

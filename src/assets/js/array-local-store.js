@@ -26,6 +26,10 @@ export function save(key, item, compare, maxLen) {
   return list
 }
 
+export function saveAll(key, items) {
+  storage.set(key, items)
+}
+
 export function remove(key, compare) {
   const list = storage.get(key, [])
   deleteFromArray(list, compare)
