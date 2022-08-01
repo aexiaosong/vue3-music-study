@@ -15,7 +15,7 @@ export default function createToggleComponentDirective(Comp) {
   // 组件上树
   function append(el) {
     const style = getComputedStyle(el)
-    if (['absolute', 'fixed', 'relative'].indexOf(style.position) !== -1) {
+    if (['absolute', 'fixed', 'relative'].indexOf(style.position) === -1) {
       addClass(el, relativeCls) // 给指令所在节点开启position定位
     }
     el.appendChild(el[NAME]._toggleInstance.$el)
@@ -46,13 +46,13 @@ export default function createToggleComponentDirective(Comp) {
     },
     
     updated(el, binding) {
+      // 重置文本
+      const title = binding.arg
+      if (typeof title !== 'undefined') {
+        el[NAME]._toggleInstance.setTitle(title)
+      }
       // toggle
       if (binding.value !== binding.oldValue) {
-        // 重置文本
-        const title = binding.arg
-        if (typeof title !== 'undefined') {
-          el[NAME]._toggleInstance.setTitle(title)
-        }
         // 组件展示处理
         binding.value ? append(el) : remove(el)
       }
