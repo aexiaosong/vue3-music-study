@@ -36,6 +36,12 @@
         <div class="search-result" v-show="query">
           <suggest :query="query" :show-singer="false" @select-song="selectSongBySuggest"></suggest>
         </div>
+        <message ref="messageRef">
+          <div class="message-title">
+            <i class="icon-ok"></i>
+            <span class="text">1首歌曲已经添加到播放列表</span>
+          </div>
+        </message>
       </div>
     </transition>
   </teleport>
@@ -49,18 +55,20 @@ import Switches from '@/components/base/switches/switches'
 import Scroll from '@/components/base/scroll/scroll'
 import SongList from '@/components/base/song-list/song-list'
 import SearchList from '@/components/base/search-list/search-list'
+import Message from '@/components/base/message/message'
 import { useStore } from 'vuex'
 import useSearchHistory from '@/components/search/useSearchHistory'
 
 export default {
   name: 'add-song',
-  components: { SearchInput, Suggest, Switches, Scroll, SongList, SearchList },
+  components: { SearchInput, Suggest, Switches, Scroll, SongList, SearchList, Message },
   setup() {
     const visible = ref(false)
     const query = ref('')
     const currentIndex = ref(0)
     const store = useStore()
     const scrollRef = ref(null)
+    const messageRef = ref(null)
 
     const searchHistory = computed(() => store.state.searchHistory)
     const playHistory = computed(() => store.state.playHistory)
@@ -99,6 +107,11 @@ export default {
 
     const addSong = (song) => {
       store.dispatch('addSong', song)
+      showMessage()
+    }
+
+    const showMessage = () => {
+      messageRef.value.show()
     }
 
     const { saveSearch } = useSearchHistory()
@@ -108,6 +121,7 @@ export default {
       currentIndex, scrollRef,
       playHistory, selectSongBySongList,
       searchHistory, addQuery, selectSongBySuggest,
+      messageRef
     }
   }
 }
@@ -163,6 +177,20 @@ export default {
     top: 124px;
     bottom: 0;
     width: 100%;
+  }
+}
+.message-title {
+  text-align: center;
+  padding: 18px 0;
+  font-size: 0;
+  .icon-ok {
+    font-size: $font-size-medium;
+    color: $color-theme;
+    margin-right: 4px;
+  }
+  .text {
+    font-size: $font-size-medium;
+    color: $color-text;
   }
 }
 </style>
