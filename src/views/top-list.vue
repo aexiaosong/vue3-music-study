@@ -25,9 +25,9 @@
 
 <script>
 import Scroll from '@/components/base/scroll/scroll'
-  import { getTopList } from '@/service/top-list'
-  import { TOP_KEY } from '@/assets/js/constant'
-  import storage from 'good-storage'
+import { getTopList } from '@/service/top-list'
+import { TOP_KEY } from '@/assets/js/constant'
+import storage from 'good-storage'
 
 export default {
   name: 'top-list',
