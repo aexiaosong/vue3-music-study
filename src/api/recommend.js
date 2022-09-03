@@ -43,7 +43,7 @@ export function getBanner() {
     return res.banners.map(b => {
       return {
         id: b.bannerId,
-        link: 'javascript:;',
+        link: b.url,
         pic: b.pic
       }
     })

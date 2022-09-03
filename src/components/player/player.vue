@@ -367,6 +367,11 @@ export default {
         text-align: center;
         font-size: $font-size-medium;
         color: $color-text;
+        width: 50%;
+        text-overflow: ellipsis;
+        margin: 0 auto;
+        white-space: nowrap;
+        overflow: hidden;
       }
     }
     .middle {
